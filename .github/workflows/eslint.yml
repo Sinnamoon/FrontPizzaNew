@@ -1,0 +1,27 @@
+name: Run ESLint
+
+on:
+  pull_request:  # Trigger on pull requests
+  push:          # Trigger on pushes
+    branches:
+      - main    # Adjust as needed (e.g., `develop` or specific branches)
+
+jobs:
+  eslint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Specify your Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint . # Adjust this to the specific files/folders you want to lint
