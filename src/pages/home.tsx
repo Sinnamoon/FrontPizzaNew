@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search, Plus, ShoppingCart, Minus } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { initialPizzas } from '@/constant/initial-pizza'
 import { CardPizza } from '@/components/card-pizza'
 import { CartItem } from '@/types/pizza.type'
+import { useCartStore } from '@/store/cart-store'
 
 type Pizza = {
   id: number;
@@ -22,6 +23,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const navigate = useNavigate();
+  const {cart, totalPrice, updateCart} = useCartStore()
 
   const filteredPizzas = pizzas.filter((pizza) =>
     pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -30,27 +32,31 @@ export default function HomePage() {
     )
   )
 
+  useEffect(() => {
+    console.log(cart)
+  }, [cart])
+
   const handleNewPizza = (newPizza: Pizza) => {
     setPizzas([...pizzas, newPizza])
   }
 
-  const updateCart = (pizza: Pizza, quantity: number) => {
-    setCartItems(prevItems => {
-      const existingItemIndex = prevItems.findIndex(item => item.id === pizza.id);
-      if (existingItemIndex !== -1) {
-        if (quantity === 0) {
-          return prevItems.filter(item => item.id !== pizza.id);
-        }
-        const newItems = [...prevItems];
-        newItems[existingItemIndex] = { ...newItems[existingItemIndex], quantity };
-        return newItems;
-      }
-      if (quantity > 0) {
-        return [...prevItems, { ...pizza, quantity }];
-      }
-      return prevItems;
-    });
-  }
+  // const updateCart = (pizza: Pizza, quantity: number) => {
+  //   setCartItems(prevItems => {
+  //     const existingItemIndex = prevItems.findIndex(item => item.id === pizza.id);
+  //     if (existingItemIndex !== -1) {
+  //       if (quantity === 0) {
+  //         return prevItems.filter(item => item.id !== pizza.id);
+  //       }
+  //       const newItems = [...prevItems];
+  //       newItems[existingItemIndex] = { ...newItems[existingItemIndex], quantity };
+  //       return newItems;
+  //     }
+  //     if (quantity > 0) {
+  //       return [...prevItems, { ...pizza, quantity }];
+  //     }
+  //     return prevItems;
+  //   });
+  // }
 
   return (
     <div className="container mx-auto p-4">
@@ -69,9 +75,9 @@ export default function HomePage() {
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="relative">
               <ShoppingCart className="h-4 w-4" />
-              {cartItems.length > 0 && (
+              {cart.length > 0 && (
                 <Badge variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
-                  {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
                 </Badge>
               )}
             </Button>
@@ -80,11 +86,11 @@ export default function HomePage() {
             <SheetHeader>
               <SheetTitle>Your Cart</SheetTitle>
             </SheetHeader>
-            {cartItems.length === 0 ? (
+            {cart.length === 0 ? (
               <p className="text-center mt-4">Your cart is empty</p>
             ) : (
               <div className="mt-4 space-y-4">
-                {cartItems.map((item) => (
+                {cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center">
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
@@ -106,7 +112,7 @@ export default function HomePage() {
               <Button 
                 className="mt-4 w-full" 
                 onClick={() => navigate('/order')}
-                disabled={cartItems.length === 0}
+                disabled={cart.length === 0}
               >
                 Proceed to Order
               </Button>
@@ -119,7 +125,7 @@ export default function HomePage() {
           <CardPizza 
             key={pizza.id} 
             pizza={pizza} 
-            cartItem={cartItems.find(item => item.id === pizza.id)}
+            cartItem={cart.find(item => item.id === pizza.id)}
             onUpdateCart={updateCart} 
           />
         ))}

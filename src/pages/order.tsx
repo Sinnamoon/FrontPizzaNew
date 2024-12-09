@@ -7,28 +7,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from 'react-router-dom'
 import { CartItem } from '@/types/pizza.type'
 import { initialPizzas } from '@/constant/initial-pizza'
+import { useCartStore } from '@/store/cart-store'
 
 export const OrderPage = () => {
   const navigate = useNavigate()
-  const [cartItems] = useState<CartItem[]>([
-    {
-      ...initialPizzas[0],
-      quantity: 2
-    },
-    {
-      ...initialPizzas[1],
-      quantity: 1
-    }
-  ])
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [pickupTime, setPickupTime] = useState('')
+  const {cart, totalPrice, clearCart} = useCartStore()
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically send the order to your backend
-    console.log('Order submitted:', { cartItems, email, phone, pickupTime })
+    console.log('Order submitted:', { cart, email, phone, pickupTime })
     // Redirect to a confirmation page or show a success message
+
+    clearCart()
+    setEmail('')
+    setPhone('')
+    setPickupTime('')
+
   }
 
   return (
@@ -45,7 +44,7 @@ export const OrderPage = () => {
             <div className="space-y-4">
               <div>
                 <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
-                {cartItems.map((item) => (
+                {cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center">
                     <span>{item.name}</span>
                     <span>x{item.quantity}</span>

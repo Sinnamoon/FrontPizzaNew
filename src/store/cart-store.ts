@@ -1,23 +1,50 @@
-import { CartItem } from "@/types/pizza.type";
+import { CartItem, Pizza } from "@/types/pizza.type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const useBearStore = create(
-  persist(
+export const useCartStore = create(
+  persist<{
+    cart: CartItem[];
+    totalPrice: number;
+    updateCart: (pizza: Pizza, quantity: number) => void;
+  }>(
     (set, get) => ({
-      items: [],
-      addItem: (item: CartItem) => {
-        set((state) => ({
-          items: [...state.items, item],
-        }));
+      cart: [],
+      totalPrice: 0,
+      updateCart: (pizza: Pizza, quantity: number) => {
+        set((state) => {
+          const existingItemIndex = state.cart.findIndex(
+            (item) => item.id === pizza.id
+          );
+          if (existingItemIndex !== -1) {
+            if (quantity === 0) {
+              return {
+                cart: state.cart.filter((item) => item.id !== pizza.id),
+              };
+            }
+            const newItems = [...state.cart];
+            newItems[existingItemIndex] = {
+              ...newItems[existingItemIndex],
+              quantity,
+            };
+            return {
+              cart: newItems,
+            };
+          }
+          if (quantity > 0) {
+            return {
+              cart: [...state.cart, { ...pizza, quantity }],
+            };
+          }
+          return {
+            cart: state.cart.map((item) =>
+              item.id === pizza.id ? { ...item, quantity } : item
+            ),
+          };
+        });
       },
-      removeItem: (item: CartItem) => {
-        set((state) => ({
-          items: state.items.filter((i) => i.id !== item.id),
-        }));
-      },
-      clearItems: () => {
-        set({ items: [] });
+      clearCart: () => {
+        set({ cart: [], totalPrice: 0 });
       },
     }),
     {
