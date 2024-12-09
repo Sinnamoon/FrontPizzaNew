@@ -4,26 +4,27 @@ import { useState } from "react"
 import { Card, CardContent } from "./ui/card"
 import { Plus } from "lucide-react"
 import { DialogFooter, DialogHeader } from "./ui/dialog"
-import { Label } from "@radix-ui/react-label"
 import { Input } from "./ui/input"
-import { RadioGroup, RadioGroupItem } from "@radix-ui/react-radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Label } from "./ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Button } from "./ui/button"
 import { allIngredients } from "@/constant/ingredients"
 
-export const CardNewPizza = ({ onNewPizza }: { onNewPizza: (pizza: Pizza) => void }) => { 
+export const NewPizzaCard = ({ onNewPizza }: { onNewPizza: (pizza: Pizza) => void }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [newPizza, setNewPizza] = useState<Omit<Pizza, 'id'>>({
     name: '',
     base: 'tomato',
     ingredients: [],
+    image: ""
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onNewPizza({ ...newPizza, id: Date.now() })
     setIsOpen(false)
-    setNewPizza({ name: '', base: 'tomato', ingredients: [] })
+    setNewPizza({ name: '', base: 'tomato', ingredients: [], image: "" })
   }
 
   return (

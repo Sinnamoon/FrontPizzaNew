@@ -3,4 +3,7 @@ export type Pizza = {
   name: string;
   base: "cream" | "tomato";
   ingredients: string[];
+  image?: string;
 };
+
+export type CartItem = Pizza & { quantity: number };
