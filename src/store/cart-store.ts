@@ -7,6 +7,7 @@ export const useCartStore = create(
     cart: CartItem[];
     totalPrice: number;
     updateCart: (pizza: Pizza, quantity: number) => void;
+    clearCart: () => void;
   }>(
     (set, get) => ({
       cart: [],
@@ -20,6 +21,7 @@ export const useCartStore = create(
             if (quantity === 0) {
               return {
                 cart: state.cart.filter((item) => item.id !== pizza.id),
+                totalPrice: state.totalPrice - pizza.price,
               };
             }
             const newItems = [...state.cart];
@@ -29,17 +31,20 @@ export const useCartStore = create(
             };
             return {
               cart: newItems,
+              totalPrice: state.totalPrice + pizza.price * quantity,
             };
           }
           if (quantity > 0) {
             return {
               cart: [...state.cart, { ...pizza, quantity }],
+              totalPrice: state.totalPrice + pizza.price * quantity,
             };
           }
           return {
             cart: state.cart.map((item) =>
               item.id === pizza.id ? { ...item, quantity } : item
             ),
+            totalPrice: state.totalPrice,
           };
         });
       },

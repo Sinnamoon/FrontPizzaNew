@@ -6,6 +6,7 @@ export const initialPizzas: Pizza[] = [
     name: "Margherita",
     base: "tomato",
     ingredients: ["mozzarella", "basil"],
+    price: 10,
     image: "/images/margherite.jpeg",
   },
   {
@@ -13,6 +14,7 @@ export const initialPizzas: Pizza[] = [
     name: "Pepperoni",
     base: "tomato",
     ingredients: ["mozzarella", "pepperoni"],
+    price: 12,
     image: "/images/pepperoni.jpg",
   },
   {
@@ -20,6 +22,7 @@ export const initialPizzas: Pizza[] = [
     name: "Quattro Formaggi",
     base: "cream",
     ingredients: ["mozzarella", "gorgonzola", "parmesan", "ricotta"],
+    price: 15,
     image: "/images/quattro-formaggi.jpg",
   },
 ];

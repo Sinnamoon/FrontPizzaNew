@@ -46,7 +46,7 @@ export const OrderPage = () => {
                 <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
                 {cart.map((item) => (
                   <div key={item.id} className="flex justify-between items-center">
-                    <span>{item.name}</span>
+                    <span>{item.name} - {item.price*item.quantity}€</span>
                     <span>x{item.quantity}</span>
                   </div>
                 ))}
@@ -95,7 +95,10 @@ export const OrderPage = () => {
                 </div>
               </div>
             </div>
-            <Button type="submit" className="mt-4 w-full">
+            {/* <div className='flex mt-5 justify-between items-center'>
+              <span className='text-end font-bold'>Total: {totalPrice}€</span>
+            </div> */}
+            <Button type="submit" className="mt-4 w-fit">
               Place Order
             </Button>
           </form>

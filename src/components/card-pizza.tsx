@@ -36,6 +36,10 @@ export const CardPizza = ({ pizza, cartItem, onUpdateCart }: { pizza: Pizza; car
         ) : (
           <Button onClick={() => onUpdateCart(pizza, 1)}>Add to Cart</Button>
         )}
+
+        <div>
+          <span>{pizza.price}€</span>
+        </div>
       </CardFooter>
     </Card>
   )

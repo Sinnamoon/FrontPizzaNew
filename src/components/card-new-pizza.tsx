@@ -17,6 +17,7 @@ export const NewPizzaCard = ({ onNewPizza }: { onNewPizza: (pizza: Pizza) => voi
     name: '',
     base: 'tomato',
     ingredients: [],
+    price: 0,
     image: ""
   })
 
@@ -24,7 +25,7 @@ export const NewPizzaCard = ({ onNewPizza }: { onNewPizza: (pizza: Pizza) => voi
     e.preventDefault()
     onNewPizza({ ...newPizza, id: Date.now() })
     setIsOpen(false)
-    setNewPizza({ name: '', base: 'tomato', ingredients: [], image: "" })
+    setNewPizza({ name: '', base: 'tomato', ingredients: [], image: "", price: 0 })
   }
 
   return (

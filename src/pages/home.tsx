@@ -7,15 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { useNavigate } from 'react-router-dom'
 import { initialPizzas } from '@/constant/initial-pizza'
 import { CardPizza } from '@/components/card-pizza'
-import { CartItem } from '@/types/pizza.type'
+import { CartItem, Pizza } from '@/types/pizza.type'
 import { useCartStore } from '@/store/cart-store'
-
-type Pizza = {
-  id: number;
-  name: string;
-  base: 'cream' | 'tomato';
-  ingredients: string[];
-}
 
 
 export default function HomePage() {
@@ -96,6 +89,7 @@ export default function HomePage() {
                       <h3 className="font-semibold">{item.name}</h3>
                       <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                     </div>
+                    <div className='flex gap-2 items-center'>
                     <div className="flex items-center space-x-2">
                       <Button variant="outline" size="sm" onClick={() => updateCart(item, item.quantity - 1)}>
                         <Minus className="h-4 w-4" />
@@ -103,6 +97,10 @@ export default function HomePage() {
                       <Button variant="outline" size="sm" onClick={() => updateCart(item, item.quantity + 1)}>
                         <Plus className="h-4 w-4" />
                       </Button>
+                    </div>
+                    <div>
+                      <span>{item.price*item.quantity}€</span>
+                    </div>
                     </div>
                   </div>
                 ))}
