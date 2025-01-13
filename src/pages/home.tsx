@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Search, Plus, ShoppingCart, Minus } from 'lucide-react'
+import { Search, Plus, ShoppingCart, Minus, User } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet"
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { useNavigate } from 'react-router-dom'
 import { initialPizzas } from '@/constant/initial-pizza'
 import { CardPizza } from '@/components/card-pizza'
 import { CartItem, Pizza } from '@/types/pizza.type'
 import { useCartStore } from '@/store/cart-store'
+import {useUserStore} from "@/store/user-store";
 
 
 export default function HomePage() {
@@ -16,7 +18,8 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const navigate = useNavigate();
-  const {cart, totalPrice, updateCart} = useCartStore()
+  const {cart, totalPrice, updateCart} = useCartStore();
+  const {currentUser, register, login, logout} = useUserStore();
 
   const filteredPizzas = pizzas.filter((pizza) =>
     pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -107,8 +110,8 @@ export default function HomePage() {
               </div>
             )}
             <SheetFooter>
-              <Button 
-                className="mt-4 w-full" 
+              <Button
+                className="mt-4 w-full"
                 onClick={() => navigate('/order')}
                 disabled={cart.length === 0}
               >
@@ -117,14 +120,29 @@ export default function HomePage() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
+        <Popover>
+          <PopoverTrigger className="relative">
+            <User className="h-4 w-4"/>
+          </PopoverTrigger>
+          <PopoverContent className="justify-center">
+            {currentUser ? (
+                <Button onClick={logout}>Logout</Button>
+            ) : (
+                <div className="flex justify-around">
+                  <Button onClick={() => navigate('/login')}>Login</Button>
+                  <Button onClick={() => navigate('/register')}>Register</Button>
+                </div>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPizzas.map((pizza) => (
-          <CardPizza 
-            key={pizza.id} 
-            pizza={pizza} 
+          <CardPizza
+            key={pizza.id}
+            pizza={pizza}
             cartItem={cart.find(item => item.id === pizza.id)}
-            onUpdateCart={updateCart} 
+            onUpdateCart={updateCart}
           />
         ))}
         {/* <NewPizzaCard onNewPizza={handleNewPizza} /> */}

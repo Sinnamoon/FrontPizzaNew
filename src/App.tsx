@@ -5,6 +5,8 @@ import {
 import Home from './pages/home';
 import { Helper } from './pages/helper';
 import { OrderPage } from "./pages/order";
+import { LoginPage } from "@/pages/login";
+import { RegisterPage } from "@/pages/register";
 
 const router = createBrowserRouter([
   {
@@ -16,10 +18,17 @@ const router = createBrowserRouter([
     path: "/helper",
     element: <Helper />,
   },
-
   {
     path: "/order",
     element: <OrderPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
 ]);
 
