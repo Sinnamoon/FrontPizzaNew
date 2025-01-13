@@ -127,7 +127,7 @@ export default function HomePage() {
             onUpdateCart={updateCart} 
           />
         ))}
-        {/* <NewPizzaCard onNewPizza={handleNewPizza} /> */}
+        <NewPizzaCard onNewPizza={(newPizza) => updateCart(newPizza, 1)} />
       </div>
     </div>
   )
