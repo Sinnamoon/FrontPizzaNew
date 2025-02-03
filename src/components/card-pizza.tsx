@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Star } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -7,17 +7,32 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { CartItem, Pizza } from "@/types/pizza.type";
+import { Pizza } from "@/types/pizza.type";
 import { useCartStore } from "@/store/cart-store";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { useFavoriteStore } from "@/store/favorite-store";
 
-export const CardPizza = ({ pizza }: { pizza: Pizza }) => {
+export const CardPizza: React.FC<{
+  pizza: Pizza;
+}> = ({ pizza }) => {
   const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
   const { updateCart, cart } = useCartStore();
+  const favoriteStore = useFavoriteStore((state) => state);
+
+  const isFavorite = useMemo(() => {
+    return favoriteStore.favorite.find((item) => item.id === pizza.id);
+  }, [favoriteStore.favorite, pizza.id]);
 
   const cartItem = useMemo(() => {
     return cart.find((item) => item.id === pizza.id);
   }, [cart]);
+
+  const handleFavorite = () => {
+    console.log("clicked favorite");
+    favoriteStore.handleFavorite(pizza);
+    console.log(favoriteStore.favorite);
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -26,6 +41,13 @@ export const CardPizza = ({ pizza }: { pizza: Pizza }) => {
           src={pizza.image}
           alt={`${pizza.name} pizza`}
           className="h-48 w-full object-cover"
+        />
+        <Star
+          onClick={() => handleFavorite()}
+          className={cn(
+            "absolute top-4 right-4 hover:text-yellow-500 hover:fill-yellow-500 transition-all duration-300 cursor-pointer",
+            isFavorite && "text-yellow-500 fill-yellow-500"
+          )}
         />
       </div>
       <CardHeader>
