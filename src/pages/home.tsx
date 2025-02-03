@@ -7,6 +7,7 @@ import {
   Filter,
   X,
   Star,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -249,7 +250,9 @@ export default function HomePage() {
         </Sheet>
         <Popover>
           <PopoverTrigger className="relative">
-            <User className="h-4 w-4" />
+            <Button>
+              <User className="h-4 w-4" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="justify-center">
             {currentUser ? (
