@@ -1,58 +1,66 @@
-import { useEffect, useState } from 'react'
-import { Search, Plus, ShoppingCart, Minus, User } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet"
+import { useEffect, useState } from "react";
+import { Search, Plus, ShoppingCart, Minus, Filter, X, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
-import { useNavigate } from 'react-router-dom'
-import { initialPizzas } from '@/constant/initial-pizza'
-import { CardPizza } from '@/components/card-pizza'
-import { CartItem, Pizza } from '@/types/pizza.type'
-import { useCartStore } from '@/store/cart-store'
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import { initialPizzas } from "@/constant/initial-pizza";
+import { CardPizza } from "@/components/card-pizza";
+import { CartItem, Pizza } from "@/types/pizza.type";
+import { useCartStore } from "@/store/cart-store";
 import {useUserStore} from "@/store/user-store";
-
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { allIngredients } from "@/constant/ingredients";
+import { NewPizzaCard } from "@/components/card-new-pizza";
 
 export default function HomePage() {
-  const [pizzas, setPizzas] = useState<Pizza[]>(initialPizzas)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
+  const [pizzas, setPizzas] = useState<Pizza[]>(initialPizzas);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [ingredientFilters, setIngredientFilters] = useState<string[]>([]);
+  const [baseFilter, setBaseFilter] = useState<"all" | "cream" | "tomato">(
+    "all"
+  );
   const navigate = useNavigate();
-  const {cart, totalPrice, updateCart} = useCartStore();
   const {currentUser, register, login, logout} = useUserStore();
-
-  const filteredPizzas = pizzas.filter((pizza) =>
-    pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pizza.ingredients.some((ingredient) =>
-      ingredient.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  )
+  const { cart, totalPrice, updateCart } = useCartStore();
 
   useEffect(() => {
-    console.log(cart)
-  }, [cart])
+    console.log(cart);
+  }, [cart]);
 
   const handleNewPizza = (newPizza: Pizza) => {
-    setPizzas([...pizzas, newPizza])
-  }
+    setPizzas([...pizzas, newPizza]);
+  };
 
-  // const updateCart = (pizza: Pizza, quantity: number) => {
-  //   setCartItems(prevItems => {
-  //     const existingItemIndex = prevItems.findIndex(item => item.id === pizza.id);
-  //     if (existingItemIndex !== -1) {
-  //       if (quantity === 0) {
-  //         return prevItems.filter(item => item.id !== pizza.id);
-  //       }
-  //       const newItems = [...prevItems];
-  //       newItems[existingItemIndex] = { ...newItems[existingItemIndex], quantity };
-  //       return newItems;
-  //     }
-  //     if (quantity > 0) {
-  //       return [...prevItems, { ...pizza, quantity }];
-  //     }
-  //     return prevItems;
-  //   });
-  // }
+  const filteredPizzas = pizzas.filter((pizza) => {
+    const matchesSearch =
+      pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pizza.ingredients.some((ingredient) =>
+        ingredient.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    const matchesBase = baseFilter === "all" || pizza.base === baseFilter;
+    const matchesIngredients =
+      ingredientFilters.length === 0 ||
+      ingredientFilters.every((ing) => pizza.ingredients.includes(ing));
+    return matchesSearch && matchesBase && matchesIngredients;
+  });
 
   return (
     <div className="container mx-auto p-4">
@@ -67,12 +75,85 @@ export default function HomePage() {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Filter className=" h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel className="flex w-full items-center justify-between">
+              <span>Pizza Base</span>
+              {baseFilter !== "all" && (
+                <X onClick={(e) => setBaseFilter("all")} />
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={baseFilter === "all"}
+              onCheckedChange={() => setBaseFilter("all")}
+            >
+              All
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={baseFilter === "tomato"}
+              onCheckedChange={() => setBaseFilter("tomato")}
+            >
+              Tomato
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={baseFilter === "cream"}
+              onCheckedChange={() => setBaseFilter("cream")}
+            >
+              Cream
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="flex justify-between items-center w-full">
+              <span>Ingredients</span>
+              {Boolean(ingredientFilters.length) && (
+                <X onClick={(e) => setIngredientFilters([])} />
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {allIngredients
+              .filter(
+                (ingredient) =>
+                  filteredPizzas.filter((pizza) =>
+                    pizza.ingredients.includes(ingredient)
+                  ).length > 0
+              )
+              .map((ingredient) => (
+                <DropdownMenuCheckboxItem
+                  key={ingredient}
+                  checked={ingredientFilters.includes(ingredient)}
+                  onCheckedChange={(checked) => {
+                    setIngredientFilters((prev) =>
+                      checked
+                        ? [...prev, ingredient]
+                        : prev.filter((i) => i !== ingredient)
+                    );
+                  }}
+                >
+                  {ingredient} (
+                  {
+                    filteredPizzas.filter((pizza) =>
+                      pizza.ingredients.includes(ingredient)
+                    ).length
+                  }
+                  )
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="relative">
               <ShoppingCart className="h-4 w-4" />
               {cart.length > 0 && (
-                <Badge variant="destructive" className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center">
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center"
+                >
                   {cart.reduce((total, item) => total + item.quantity, 0)}
                 </Badge>
               )}
@@ -87,23 +168,36 @@ export default function HomePage() {
             ) : (
               <div className="mt-4 space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center">
+                  <div
+                    key={item.id}
+                    className="flex justify-between items-center"
+                  >
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                      <p className="text-sm text-gray-500">
+                        Quantity: {item.quantity}
+                      </p>
                     </div>
-                    <div className='flex gap-2 items-center'>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => updateCart(item, item.quantity - 1)}>
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => updateCart(item, item.quantity + 1)}>
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div>
-                      <span>{item.price*item.quantity}€</span>
-                    </div>
+                    <div className="flex gap-2 items-center">
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateCart(item, item.quantity - 1)}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateCart(item, item.quantity + 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div>
+                        <span>{item.price * item.quantity}€</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -112,7 +206,7 @@ export default function HomePage() {
             <SheetFooter>
               <Button
                 className="mt-4 w-full"
-                onClick={() => navigate('/order')}
+                onClick={() => navigate("/order")}
                 disabled={cart.length === 0}
               >
                 Proceed to Order
@@ -144,12 +238,10 @@ export default function HomePage() {
           <CardPizza
             key={pizza.id}
             pizza={pizza}
-            cartItem={cart.find(item => item.id === pizza.id)}
-            onUpdateCart={updateCart}
           />
         ))}
-        {/* <NewPizzaCard onNewPizza={handleNewPizza} /> */}
+        <NewPizzaCard onNewPizza={(newPizza) => updateCart(newPizza, 1)} />
       </div>
     </div>
-  )
+  );
 }
