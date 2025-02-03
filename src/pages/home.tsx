@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Search, Plus, ShoppingCart, Minus, Filter, X } from "lucide-react";
+import {
+  Search,
+  Plus,
+  ShoppingCart,
+  Minus,
+  Filter,
+  X,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,17 +34,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { allIngredients } from "@/constant/ingredients";
 import { NewPizzaCard } from "@/components/card-new-pizza";
+import { useFavoriteStore } from "@/store/favorite-store";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const [pizzas, setPizzas] = useState<Pizza[]>(initialPizzas);
   const [searchTerm, setSearchTerm] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [ingredientFilters, setIngredientFilters] = useState<string[]>([]);
+  const [filterFavorite, setFilterFavorite] = useState(false);
   const [baseFilter, setBaseFilter] = useState<"all" | "cream" | "tomato">(
     "all"
   );
   const navigate = useNavigate();
   const { cart, totalPrice, updateCart } = useCartStore();
+  const favoriteStore = useFavoriteStore();
 
   useEffect(() => {
     console.log(cart);
@@ -46,18 +58,24 @@ export default function HomePage() {
     setPizzas([...pizzas, newPizza]);
   };
 
-  const filteredPizzas = pizzas.filter((pizza) => {
-    const matchesSearch =
-      pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pizza.ingredients.some((ingredient) =>
-        ingredient.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    const matchesBase = baseFilter === "all" || pizza.base === baseFilter;
-    const matchesIngredients =
-      ingredientFilters.length === 0 ||
-      ingredientFilters.every((ing) => pizza.ingredients.includes(ing));
-    return matchesSearch && matchesBase && matchesIngredients;
-  });
+  const filteredPizzas = pizzas
+    .filter((pizza) => {
+      return filterFavorite
+        ? favoriteStore.favorite.find((p) => p.id === pizza.id)
+        : true;
+    })
+    .filter((pizza) => {
+      const matchesSearch =
+        pizza.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pizza.ingredients.some((ingredient) =>
+          ingredient.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      const matchesBase = baseFilter === "all" || pizza.base === baseFilter;
+      const matchesIngredients =
+        ingredientFilters.length === 0 ||
+        ingredientFilters.every((ing) => pizza.ingredients.includes(ing));
+      return matchesSearch && matchesBase && matchesIngredients;
+    });
 
   return (
     <div className="container mx-auto p-4">
@@ -72,6 +90,17 @@ export default function HomePage() {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
+        <Button
+          variant="outline"
+          onClick={() => setFilterFavorite(!filterFavorite)}
+        >
+          <Star
+            className={cn(
+              " h-4 w-4 transition-all duration-300 cursor-pointer",
+              filterFavorite && "text-yellow-500 fill-yellow-500"
+            )}
+          />
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
