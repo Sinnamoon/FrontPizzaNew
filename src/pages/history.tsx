@@ -9,23 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { CartItem } from "@/types/pizza.type";
-import { initialPizzas } from "@/constant/initial-pizza";
-import { useCartStore } from "@/store/cart-store";
 import { useOrderStore } from "@/store/order-store";
 
 export const HistoryPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [orders, setOrders] = useState<any[]>([]);
   const store = useOrderStore();
 
   const filteredOrders = useMemo(() => {
