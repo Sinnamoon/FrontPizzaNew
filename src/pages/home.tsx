@@ -126,7 +126,10 @@ export default function HomePage() {
           </PopoverTrigger>
           <PopoverContent className="justify-center">
             {currentUser ? (
-                <Button onClick={logout}>Logout</Button>
+                <Button onClick={()=> {
+                  logout();
+                  navigate("/");
+                }}>Logout</Button>
             ) : (
                 <div className="flex justify-around">
                   <Button onClick={() => navigate('/login')}>Login</Button>
