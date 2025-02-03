@@ -18,12 +18,18 @@ import {
   SheetTrigger,
   SheetFooter,
 } from "@/components/ui/sheet";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { initialPizzas } from "@/constant/initial-pizza";
 import { CardPizza } from "@/components/card-pizza";
 import { CartItem, Pizza } from "@/types/pizza.type";
 import { useCartStore } from "@/store/cart-store";
+import { useUserStore } from "@/store/user-store";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -47,6 +53,7 @@ export default function HomePage() {
     "all"
   );
   const navigate = useNavigate();
+  const { currentUser, register, login, logout } = useUserStore();
   const { cart, totalPrice, updateCart } = useCartStore();
   const favoriteStore = useFavoriteStore();
 
@@ -240,6 +247,28 @@ export default function HomePage() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
+        <Popover>
+          <PopoverTrigger className="relative">
+            <User className="h-4 w-4" />
+          </PopoverTrigger>
+          <PopoverContent className="justify-center">
+            {currentUser ? (
+              <Button
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <div className="flex justify-around">
+                <Button onClick={() => navigate("/login")}>Login</Button>
+                <Button onClick={() => navigate("/register")}>Register</Button>
+              </div>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPizzas.map((pizza) => (
